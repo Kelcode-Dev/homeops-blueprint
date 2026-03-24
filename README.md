@@ -138,4 +138,4 @@ kubectl describe hr -n tailscale tsop
 * **Namespace Mismatch**: Verify that your `HelmRelease` metadata namespace matches the `namespace.yaml` provided in your base or overlay directories
 
 ### Immediate Actionable Tip
-If you make a change and don't want to wait for the `interval` (e.g., 1h) to pass, you can force an immediate sync with `flux reconcile ks infrastructure --with-source`. This is the fastest way to verify a fix during active development.
+If you make a change and don't want to wait for the `interval` (e.g., 1h) to pass, you can force an immediate sync with `flux reconcile ks infrastructure --with-source`. This is the fastest way to verify a fix during active development. If this fails `flux suspend ks infrastructure` and `flux resume ks infrastructure` may give it a nudge in the right direction.
