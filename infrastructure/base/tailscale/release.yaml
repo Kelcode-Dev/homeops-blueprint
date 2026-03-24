@@ -1,0 +1,54 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: tsop
+  namespace: tailscale
+spec:
+  interval: 24h
+  chart:
+    spec:
+      chart: tailscale-operator
+      version: "1.94.x"
+      sourceRef:
+        kind: HelmRepository
+        name: tailscale
+        namespace: flux-system
+  values:
+    operatorConfig:
+      podSecurityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      securityContext:
+        allowPrivilegeEscalation: false
+        capabilities: { drop: ["ALL"] }
+        readOnlyRootFilesystem: true
+        runAsUser: 1000
+        runAsGroup: 1000
+    apiServerProxyConfig:
+      mode: true
+      allowImpersonation: true
+  postRenderers:
+    - kustomize:
+        patches:
+          - patch: |
+              apiVersion: apps/v1
+              kind: Deployment
+              metadata:
+                name: operator
+                namespace: tailscale
+              spec:
+                template:
+                  spec:
+                    containers:
+                      - name: operator
+                        volumeMounts:
+                          - name: tailscale-config
+                            mountPath: /.config
+                          - name: tmp-dir
+                            mountPath: /tmp
+                    volumes:
+                      - name: tailscale-config
+                        emptyDir: {}
+                      - name: tmp-dir
+                        emptyDir: {}

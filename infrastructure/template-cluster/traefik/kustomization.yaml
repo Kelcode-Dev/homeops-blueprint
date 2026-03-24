@@ -1,0 +1,8 @@
+resources:
+  - ../../base/traefik
+
+patches:
+  - path: traefik-patch.yaml
+    target:
+      kind: HelmRelease
+      name: tsop

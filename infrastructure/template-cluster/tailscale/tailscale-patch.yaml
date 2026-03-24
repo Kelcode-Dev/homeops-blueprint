@@ -1,0 +1,23 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: tsop
+  namespace: tailscale
+spec:
+  values:
+    operatorConfig:
+      defaultTags: ["tag:OPERATOR_TAG_FROM_GRANTS"]
+    apiServerProxyConfig:
+      apiServerURL: "CONTROL_PLANE_IP_ADDR"
+    proxyConfig:
+      defaultTags: "tag:TAG_FROM_GRANTS"
+  # Inject the SOPS secret for this specific cluster
+  valuesFrom:
+    - kind: Secret
+      name: operator-oauth
+      valuesKey: client-id
+      targetPath: oauth.clientId
+    - kind: Secret
+      name: operator-oauth
+      valuesKey: client-secret
+      targetPath: oauth.clientSecret

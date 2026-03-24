@@ -1,0 +1,81 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: homepage
+  namespace: homepage
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: homepage
+      version: "4.9.0"
+      sourceRef:
+        kind: HelmRepository
+        name: homepage
+        namespace: flux-system
+  values:
+
+    extraEnv:
+    - name: HOMEPAGE_CONFIG_DIR
+      value: /app/custom-config
+
+    config:
+      allowedHosts:
+        - home.gizzmoshifu.uk
+
+    volumes:
+      # The main writable persistent volume
+      - name: custom-config-storage
+        persistentVolumeClaim:
+          claimName: homepage-config
+
+      # Unique volume declarations for each file to bypass the YAML dictionary parser
+      - name: homepage-settings-vol
+        configMap:
+          name: homepage-configs
+      - name: homepage-widgets-vol
+        configMap:
+          name: homepage-configs
+      - name: homepage-services-vol
+        configMap:
+          name: homepage-configs
+      - name: homepage-bookmarks-vol
+        configMap:
+          name: homepage-configs
+      - name: homepage-proxmox-vol
+        configMap:
+          name: homepage-configs
+      - name: homepage-kubernetes-vol
+        configMap:
+          name: homepage-configs
+
+    volumeMounts:
+      # Mount the PVC to the new directory defined in extraEnv
+      - name: custom-config-storage
+        mountPath: /app/custom-config
+
+      # Mount the read-only config files into the same directory using subPath
+      - name: homepage-settings-vol
+        mountPath: /app/custom-config/settings.yaml
+        subPath: settings.yaml
+      - name: homepage-widgets-vol
+        mountPath: /app/custom-config/widgets.yaml
+        subPath: widgets.yaml
+      - name: homepage-services-vol
+        mountPath: /app/custom-config/services.yaml
+        subPath: services.yaml
+      - name: homepage-bookmarks-vol
+        mountPath: /app/custom-config/bookmarks.yaml
+        subPath: bookmarks.yaml
+      - name: homepage-proxmox-vol
+        mountPath: /app/custom-config/proxmox.yaml
+        subPath: proxmox.yaml
+      - name: homepage-kubernetes-vol
+        mountPath: /app/custom-config/kubernetes.yaml
+        subPath: kubernetes.yaml
+
+    # Enable RBAC so the kubernetes widgets work
+    rbac:
+      enabled: true
+    serviceAccount:
+      create: true

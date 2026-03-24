@@ -1,0 +1,41 @@
+name: Flux Diff Preview
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'clusters/**'
+      - 'infrastructure/**'
+      - 'apps/**'
+
+jobs:
+  diff:
+    runs-on: [self-hosted, homeops] # Requires a runner in your cluster network
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Flux CLI
+        uses: fluxcd/flux2/action@main
+
+      - name: Diff Infrastructure
+        id: diff-infra
+        run: |
+          # Compare the PR branch against the live cluster state
+          DIFF=$(flux diff kustomization infrastructure \
+            --path ./infrastructure/talos-eternium \
+            --kustomization-file ./clusters/talos-eternium/infrastructure.yaml)
+          echo "diff<<EOF" >> $GITHUB_OUTPUT
+          echo "$DIFF" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Post Diff to PR
+        uses: mshick/add-pr-comment@v2
+        with:
+          message-id: flux-diff
+          message: |
+            ### 🔍 Flux Diff Preview
+            ```diff
+            ${{ steps.diff-infra.outputs.diff }}
+            ```

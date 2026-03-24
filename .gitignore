@@ -1,0 +1,31 @@
+# ---
+# HomeOps Blueprint Safety Net
+# ---
+
+# Secrets & Keys (The big ones)
+*.agekey
+*.txt
+*.key
+*.pem
+.env
+.env.*
+
+# Transparent Template Protection
+# Ignores raw .yaml secrets but allows the encrypted .sops.yaml versions
+**/*secret.yaml
+**/secrets/*.yaml
+
+# Always allow the encrypted SOPS versions
+!**/*.sops.yaml
+
+# Kubernetes / Helm
+.kube/
+charts/
+Chart.lock
+
+# OS / IDE Junk
+.DS_Store
+.idea/
+.vscode/
+*.swp
+node_modules/

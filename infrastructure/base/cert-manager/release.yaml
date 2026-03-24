@@ -1,0 +1,35 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: cert-manager
+  namespace: cert-manager
+spec:
+  releaseName: cert-manager
+  chart:
+    spec:
+      chart: cert-manager
+      version: "v1.20.0" # Match your current version exactly
+      sourceRef:
+        kind: HelmRepository
+        name: jetstack
+        namespace: flux-system
+  interval: 1h
+  install:
+    crds: CreateReplace # Critical for cert-manager
+  upgrade:
+    crds: CreateReplace
+  values:
+    crds:
+      enabled: true
+    replicaCount: 2
+    webhook:
+      replicaCount: 3
+    cainjector:
+      replicaCount: 2
+    resources:
+      requests:
+        cpu: 10m
+        memory: 32Mi
+      limits:
+        cpu: 100m
+        memory: 128Mi

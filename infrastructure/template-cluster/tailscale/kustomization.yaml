@@ -1,0 +1,9 @@
+resources:
+  - ../../base/tailscale
+  - tailscale-secrets.sops.yaml
+
+patches:
+  - path: tailscale-patch.yaml
+    target:
+      kind: HelmRelease
+      name: tsop

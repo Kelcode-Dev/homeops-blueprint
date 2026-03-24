@@ -1,0 +1,16 @@
+# ---
+# SETUP INSTRUCTIONS
+# 1. Replace 'YOUR_CLOUDFLARE_API_TOKEN' with your actual token below.
+# 2. Run this command to encrypt the file with your own Age key:
+#    `sops --encrypt --in-place cloudflare-api-token.sops.yaml`
+# 4. Ensure your kustomization.yaml points to the .sops.yaml version.
+# ---
+
+apiVersion: v1
+kind: Secret
+metadata:
+    name: cloudflare-api-token-secret
+    namespace: cert-manager
+type: Opaque
+stringData:
+    api_token: "YOUR_CLOUDFLARE_API_TOKEN"

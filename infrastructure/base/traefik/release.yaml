@@ -1,0 +1,74 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: traefik
+  namespace: traefik
+spec:
+  releaseName: traefik
+  chart:
+    spec:
+      chart: traefik
+      version: "39.x.x"
+      sourceRef:
+        kind: HelmRepository
+        name: traefik
+        namespace: flux-system
+  interval: 1h
+  install:
+    createNamespace: true
+    crds: CreateReplace
+  upgrade:
+    crds: CreateReplace
+  values:
+    global:
+      sendAnonymousUsage: false
+    deployment:
+      enabled: true
+      replicas: 3
+      podAntiAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/name: traefik
+              topologyKey: kubernetes.io/hostname
+    ports:
+      web:
+        port: 8000
+        exposedPort: 80
+        http:
+          redirections:
+            entryPoint:
+              to: websecure
+              scheme: https
+              permanent: true
+      websecure:
+        port: 8443
+        exposedPort: 443
+        http3:
+          enabled: true
+    providers:
+      kubernetesCRD:
+        enabled: true
+        allowCrossNamespace: true
+      kubernetesIngress:
+        enabled: true
+        publishedService:
+          enabled: true
+    logs:
+      general:
+        level: INFO
+      access:
+        enabled: true
+
+    metrics:
+      prometheus:
+        service:
+          enabled: true
+        disableAPICheck: false
+        serviceMonitor:
+          enabled: true
+        prometheusRule:
+          enabled: false
+

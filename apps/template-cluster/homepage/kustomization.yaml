@@ -1,0 +1,40 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../../base/homepage
+  # - homepage-secrets.sops.yaml
+
+configMapGenerator:
+  - name: homepage-configs
+    namespace: homepage
+    options:
+      disableNameSuffixHash: true
+    files:
+      # - settings.yaml
+      # - widgets.yaml
+      # - services.yaml
+      # - bookmarks.yaml
+      # - etc.
+
+patches:
+  - patch: |-
+      - op: replace
+        path: /spec/rules/0/host
+        value: YOUR_HOSTNAME_FOR_HOMEPAGE
+      - op: replace
+        path: /spec/tls/0/hosts/0
+        value: YOUR_HOSTNAME_FOR_HOMEPAGE
+    target:
+      kind: Ingress
+      name: homepage-ingress
+      namespace: homepage
+  - patch: |-
+      - op: add
+        path: /spec/values/extraEnvFrom
+        value:
+          - secretRef:
+              name: homepage-secrets
+    target:
+      kind: HelmRelease
+      name: homepage
+      namespace: homepage

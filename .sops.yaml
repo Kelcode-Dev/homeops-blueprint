@@ -1,0 +1,13 @@
+# ---
+# REPOSITORY ENCRYPTION SETUP
+# 1. Generate a new Age key: age-keygen -o age.agekey
+# 2. Extract public key for 'age:' field: cat age.agekey | grep "public key"
+# 3. Create cluster secret: kubectl create secret generic sops-age \
+#    --namespace=flux-system --from-file=age.agekey=age.agekey
+# ---
+
+creation_rules:
+  - path_regex: .*\.sops\.yaml
+    encrypted_regex: ^(data|stringData)$
+    # generate via
+    age: age1your__PUBLIC__keyhere...

@@ -1,0 +1,38 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: cnpg
+  namespace: postgresql
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: cloudnative-pg
+      version: "0.27.x"
+      sourceRef:
+        kind: HelmRepository
+        name: cloudnative-pg
+        namespace: flux-system
+  timeout: 10m
+  values:
+    nodeSelector:
+      node-role.kubernetes.io/cpu-worker: "true"
+    # Resource configuration for the operator
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi
+    # Enable monitoring with Prometheus
+    monitoring:
+      podMonitorEnabled: true
+      grafanaDashboard:
+        create: true
+    # Configuration for webhook certificates
+    webhook:
+      mutating:
+        create: true
+      validating:
+        create: true

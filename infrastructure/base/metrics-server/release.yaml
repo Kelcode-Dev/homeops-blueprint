@@ -1,0 +1,38 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: ms
+  namespace: metrics-server
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: metrics-server
+      version: "3.13.x"
+      sourceRef:
+        kind: HelmRepository
+        name: metrics-server
+        namespace: flux-system
+  values:
+    containerPort: 4443
+
+    service:
+      ports:
+        https: 4443
+
+    args:
+      - --kubelet-preferred-address-types=Hostname,InternalIP,ExternalIP
+      - --metric-resolution=15s
+      - --kubelet-use-node-status-port
+    metrics:
+      enabled: true
+    serviceMonitor:
+      enabled: false
+
+    podSecurityContext:
+      runAsNonRoot: true
+      seccompProfile:
+        type: RuntimeDefault
+
+    nodeSelector:
+      node-role.kubernetes.io/cpu-worker: "true"
