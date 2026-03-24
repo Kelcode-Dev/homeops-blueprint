@@ -25,11 +25,8 @@ jobs:
         run: |
           # Recursively find all Kustomizations in the clusters directory
           # and ensure they can be built successfully
-          find clusters -name "*.yaml" -type f | while read -r file; do
-            if grep -q "kind: Kustomization" "$file"; then
-              echo "Validating $file..."
-              flux build kustomization "$(basename "${file%.*}")" \
-                --path "$(dirname "$file")" \
-                --kustomization-file "$file" > /dev/null
-            fi
+          find . -type f -name "kustomization.yaml" -not -path "**/flux-system/*" | while read -r file; do
+            dir=$(dirname "$file")
+            echo "Validating Kustomize build in $dir..."
+            kustomize build "$dir" > /dev/null
           done
