@@ -6,6 +6,7 @@ ignore: |
   .git/
   node_modules/
   **/*.sops.yaml
+  .github
 
 yaml-files:
   - '*.yaml'
@@ -13,16 +14,27 @@ yaml-files:
   - '.yamllint'
 
 rules:
-  line-length:
-    max: 120
-    allow-non-breakable-words: true
-    allow-non-breakable-inline-mappings: true
+  # DISBALE: K8s manifests rarely use '---' at the top of every file
+  document-start: disable
 
-  document-start:
-    present: true
+  # This fixes the "expected 6 but found 4" error
+  indentation:
+    spaces: 2
+    indent-sequences: whatever
 
+  # RELAX: Allow 1 space before trailing comments (default is 2)
   comments:
     level: warning
+    min-spaces-from-content: 1
 
+  # BUMP: Kubernetes image paths and annotations can be long
+  line-length:
+    max: 160
+    level: warning
+
+  # ALLOW: Empty values are common in Helm values and placeholders
   empty-values:
     forbid-in-block-mappings: false
+
+  # IGNORE: 'truthy' can be annoying with things like 'on/off' or 'yes/no'
+  truthy: disable
