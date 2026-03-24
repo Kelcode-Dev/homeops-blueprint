@@ -3,5 +3,5 @@ kind: Kustomization
 
 resources:
   - ../../base/cert-manager
-  - cloudflare-api-token.sops.yaml
+  - cloudflare-token.sops.yaml
   - cluster-issuer.yaml
