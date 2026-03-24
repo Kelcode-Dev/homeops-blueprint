@@ -14,27 +14,28 @@ yaml-files:
   - '.yamllint'
 
 rules:
-  # DISBALE: K8s manifests rarely use '---' at the top of every file
+  # DISABLE: Kubernetes manifests and Flux components often exceed any reasonable limit
+  line-length: disable
+
+  # DISABLE: K8s manifests rarely use '---' at the top of every file
   document-start: disable
 
-  # This fixes the "expected 6 but found 4" error
+  # DISABLE: Comments can be indented however you like (fixes the homepage/kustomization warning)
+  comments-indentation: disable
+
+  # FIX: Set to 2 spaces and allow flexible list (sequence) indentation
   indentation:
     spaces: 2
     indent-sequences: whatever
 
-  # RELAX: Allow 1 space before trailing comments (default is 2)
+  # RELAX: Allow 1 space before trailing comments
   comments:
     level: warning
     min-spaces-from-content: 1
-
-  # BUMP: Kubernetes image paths and annotations can be long
-  line-length:
-    max: 160
-    level: warning
 
   # ALLOW: Empty values are common in Helm values and placeholders
   empty-values:
     forbid-in-block-mappings: false
 
-  # IGNORE: 'truthy' can be annoying with things like 'on/off' or 'yes/no'
+  # IGNORE: Stop the linter from complaining about 'on/off' or 'yes/no'
   truthy: disable

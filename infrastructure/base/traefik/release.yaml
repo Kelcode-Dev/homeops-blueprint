@@ -71,4 +71,3 @@ spec:
           enabled: true
         prometheusRule:
           enabled: false
-
