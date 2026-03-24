@@ -1,0 +1,26 @@
+---
+extends: default
+
+rules:
+  # K8s manifests often have very long lines (tokens, certs, etc.)
+  line-length:
+    max: 120
+    allow-non-breakable-words: true
+    allow-non-breakable-inline-mappings: true
+
+  # Flux/Kustomize often uses triple-dash separators
+  document-start:
+    present: true
+
+  # Allow comments to have different indentation levels
+  comments:
+    level: warning
+
+  # Allow empty values (often used in Helm values or placeholders)
+  empty-values:
+    forbid-in-block-mappings: false
+
+  # Ignore specific files if needed
+  ignore: |
+    .git/
+    node_modules/

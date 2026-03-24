@@ -6,6 +6,7 @@ on:
       - 'clusters/**'
       - 'infrastructure/**'
       - 'apps/**'
+      - 'databases/**'
 
 jobs:
   diff:
