@@ -1,0 +1,25 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: valkey
+  namespace: valkey
+spec:
+  interval: 24h
+  chart:
+    spec:
+      chart: valkey
+      version: "0.9.x"
+      sourceRef:
+        kind: HelmRepository
+        name: valkey
+        namespace: flux-system
+  values:
+    dataStorage:
+      enabled: true
+      requestedSize: "1Gi"
+
+    # Configure metrics
+    metrics:
+      enabled: false
+      podMonitor:
+        enabled: false

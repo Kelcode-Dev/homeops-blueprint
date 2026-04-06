@@ -1,0 +1,27 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: valkey
+  namespace: valkey
+spec:
+  values:
+    auth:
+      enabled: true
+      usersExistingSecret: "valkey-auth-secret"
+      aclUsers:
+        default:
+          permissions: "~* &* +@all"
+          passwordKey: "valkey-password"
+
+    # Name of the storage class to use
+    className: "nfs-client"          # CHANGE this to match your storage class
+
+    # Replica configuration for master-replica replication mode
+    replica:
+      enabled: true
+      replicas: 3
+      persistence:
+        size: 1Gi
+        storageClass: nfs-client     # CHANGE this to match your storage class
+        accessModes:
+          - ReadWriteOnce
