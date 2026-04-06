@@ -1,0 +1,26 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: drawio-ingress
+  namespace: drawio
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+    cert-manager.io/cluster-issuer: letsencrypt   # CHANGE to your cert-manager cluster-issuer
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: draw.example.com       # CHANGE to your draw.io URL
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: drawio
+                port:
+                  number: 8080
+  tls:
+    - hosts:
+        - draw.example.com         # CHANGE to your draw.io URL
+      secretName: drawio-tls

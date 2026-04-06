@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: drawio
+  namespace: drawio
+spec:
+  template:
+    spec:
+      nodeSelector:
+        node-role.kubernetes.io/cpu-worker: "true"
+      containers:
+        - name: drawio
+          image: jgraph/drawio:latest
+          volumeMounts:
+            # Mounting to /opt/drawio/data is a safe standard
+            - name: drawio-storage
+              mountPath: /opt/drawio/data
+      volumes:
+        - name: drawio-storage
+          persistentVolumeClaim:
+            claimName: drawio-data

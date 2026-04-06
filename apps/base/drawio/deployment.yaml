@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: drawio
+  namespace: drawio
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: drawio
+  template:
+    metadata:
+      labels:
+        app: drawio
+        app.kubernetes.io/name: drawio
+    spec:
+      securityContext:
+        fsGroup: 1000
+      containers:
+        - name: drawio
+          image: jgraph/drawio:14.6.13-alpine
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              cpu: "10m"
+              memory: "64Mi"
+            limits:
+              memory: "128Mi"
+          securityContext:
+            readOnlyRootFilesystem: false
+            runAsNonRoot: true
+            runAsUser: 1000
+            seccompProfile:
+              type: RuntimeDefault
+          volumeMounts:
+            - name: tmp-volume
+              mountPath: /tmp
+      volumes:
+        - name: tmp-volume
+          emptyDir: {}
