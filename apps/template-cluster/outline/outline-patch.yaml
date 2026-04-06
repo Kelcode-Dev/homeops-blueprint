@@ -1,0 +1,110 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: outline
+  namespace: outline
+spec:
+  interval: 10m
+  chart:
+    spec:
+      chart: outline
+      version: "0.7.3" # Latest stable version
+      sourceRef:
+        kind: HelmRepository
+        name: community-charts
+        namespace: flux-system
+  values:
+    # Ignore built-in bundles and use our own if we've deployed them
+    postgresql:
+      enabled: false
+    redis:
+      enabled: false
+    minio:
+      enabled: false
+    nodeSelector:
+      node-role.kubernetes.io/cpu-worker: "true"
+
+    # Configure this if you've deployed a postgres cluster
+    externalPostgresql:
+      host: "pg-shared-rw.databases.svc.cluster.local"
+      port: 5432
+      username: "CHANGEME"      # CHANGE this to your outline database username
+      database: "CHANGEME"      # CHANGE this to your outline database name
+      existingSecret: "outline-secrets"
+      passwordSecretKey: "PGPASSWORD"
+
+    # Configure this if you've deployed a valkey cluster
+    externalRedis:
+      host: "valkey.valkey.svc.cluster.local"
+      port: 6379
+      username: ""
+      existingSecret: "outline-secrets"
+      passwordSecretKey: "REDIS_PASSWORD"
+
+    secretKeyExternalSecret:
+      name: "outline-secrets"
+      key: "SECRET_KEY"
+    utilsSecretExternalSecret:
+      name: "outline-secrets"
+      key: "UTILS_SECRET"
+
+    # Configure this if you have access to an S3 cluster
+    fileStorage:
+      mode: s3
+      s3:
+        existingSecret: "outline-secrets"
+        accessKeyIdSecretKey: "AWS_ACCESS_KEY_ID"
+        secretAccessKeySecretKey: "AWS_SECRET_ACCESS_KEY"
+    extraSecretNamesForEnvFrom:
+      - outline-secrets
+
+    # Configure the ingress
+    ingress:
+      enabled: true
+      className: traefik
+      annotations:
+        traefik.ingress.kubernetes.io/router.entrypoints: websecure
+        traefik.ingress.kubernetes.io/router.tls: "true"
+        cert-manager.io/cluster-issuer: letsencrypt       # CHANGE this to your cert-manager cluster issuer
+      hosts:
+        - host: outline.example.com                       # CHANGE this to your outline URL
+          paths:
+            - path: /
+              pathType: ImplementationSpecific
+      tls:
+        - secretName: outline-tls
+          hosts:
+            - outline.example.com                         # CHANGE this to your outline URL
+
+    # Tweak security context
+    securityContext:
+      seccompProfile:
+        type: RuntimeDefault
+
+    # Set these if you run into quorum related issues with the pods
+    resources:
+      requests:
+        cpu: "1000m"
+        memory: "1Gi"
+      limits:
+        memory: "2Gi"
+    logging:
+      level: debug
+      extraDebug:
+        - http
+        - router
+        - store
+        - policies
+
+    # Extend the probes on first start as the databases is bootstrapped
+    livenessProbe:
+      initialDelaySeconds: 300
+      periodSeconds: 10
+      timeoutSeconds: 5
+      failureThreshold: 3
+
+    readinessProbe:
+      initialDelaySeconds: 60
+      periodSeconds: 10
+      timeoutSeconds: 5
+      failureThreshold: 3
