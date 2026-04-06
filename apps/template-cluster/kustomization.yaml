@@ -6,7 +6,7 @@ resources:
   - podinfo
   - homepage
   - directus
-  - draw.io
+  - drawio
   - linkding
   - outline
   - transmute
