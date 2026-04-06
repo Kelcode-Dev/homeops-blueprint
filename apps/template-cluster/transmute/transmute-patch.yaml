@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: transmute
+  namespace: transmute
+spec:
+  template:
+    spec:
+      nodeSelector:
+        node-role.kubernetes.io/cpu-worker: "true"
+      securityContext:
+        fsGroup: 1000
+      containers:
+        - name: transmute
+          envFrom:
+            - secretRef:
+                name: transmute-secrets
+          volumeMounts:
+            - name: transmute-data
+              mountPath: /app/data
+      volumes:
+        - name: transmute-data
+          persistentVolumeClaim:
+            claimName: transmute-data

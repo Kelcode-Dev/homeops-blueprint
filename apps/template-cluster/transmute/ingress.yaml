@@ -1,0 +1,26 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: transmute-ingress
+  namespace: transmute
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+    cert-manager.io/cluster-issuer: letsencrypt  # CHANGE this to match your cluster issuer in cert-manager
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: transmute.example.com         # CHANGE this to the URL of your transmute service
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: transmute
+                port:
+                  number: 3313
+  tls:
+    - hosts:
+        - transmute.example.com           # CHANGE this to the URL of your transmute service
+      secretName: transmute-tls

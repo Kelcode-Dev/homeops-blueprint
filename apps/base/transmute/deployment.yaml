@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: transmute
+  namespace: transmute
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: transmute
+  template:
+    metadata:
+      labels:
+        app: transmute
+        app.kubernetes.io/name: transmute
+    spec:
+      containers:
+        - name: transmute
+          image: ghcr.io/transmute-app/transmute:v0.9
+          ports:
+            - containerPort: 3313
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+            limits:
+              cpu: "1000m"
+              memory: "1Gi"
+          securityContext:
+            readOnlyRootFilesystem: false
+            runAsNonRoot: true
+            runAsUser: 1000
