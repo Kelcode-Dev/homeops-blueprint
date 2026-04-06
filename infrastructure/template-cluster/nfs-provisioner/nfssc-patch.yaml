@@ -1,0 +1,15 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: nfssc
+  namespace: nfssc
+spec:
+  values:
+    # Pin to our cpu workers
+    nodeSelector:
+      node-role.kubernetes.io/cpu-worker: "true"
+
+    # configure nfs settings
+    nfs:
+      server: 192.168.0.201     # CHANGE this to the IP/Address of your NFS server
+      path: /data/k8-volumes    # CHANGE this to the path exposed by your NFS server

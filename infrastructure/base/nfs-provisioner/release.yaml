@@ -1,0 +1,48 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: nfssc
+  namespace: nfssc
+spec:
+  interval: 24h
+  chart:
+    spec:
+      chart: nfs-subdir-external-provisioner
+      version: "4.0.x"
+      sourceRef:
+        kind: HelmRepository
+        name: nfssc
+        namespace: flux-system
+  values:
+    replicaCount: 1
+    strategyType: Recreate
+
+    # set as default storage class
+    storageClass:
+      name: nfs-client
+      defaultClass: true
+
+    # configure resources limits
+    resources:
+      requests:
+        cpu: 5m
+        memory: 32Mi
+      limits:
+        cpu: 100m
+        memory: 256Mi
+
+    # configure security context for talos
+    securityContext:
+      runAsNonRoot: true
+      runAsUser: 1000
+      runAsGroup: 1000
+      fsGroup: 1000
+      seccompProfile:
+        type: RuntimeDefault
+
+    podSecurityContext:
+      allowPrivilegeEscalation: false
+      runAsNonRoot: true
+      capabilities:
+        drop:
+          - ALL
