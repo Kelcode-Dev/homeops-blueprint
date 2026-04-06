@@ -1,0 +1,24 @@
+#!/bin/bash
+
+# Get staged .sops.yaml files, excluding the hidden config file
+STAGED_SOPS=$(git diff --cached --name-only --diff-filter=ACM | grep '\.sops\.yaml$' | grep -v '^\.sops\.yaml$')
+
+if [ -z "$STAGED_SOPS" ]; then
+    exit 0
+fi
+
+UNSAFE_FILES=()
+
+for file in $STAGED_SOPS; do
+    if [ -f "$file" ] && ! grep -q "sops:" "$file"; then
+        UNSAFE_FILES+=("$file")
+    fi
+done
+
+if [ ${#UNSAFE_FILES[@]} -ne 0 ]; then
+    echo -e "\033[31m[CRITICAL]\033[0m Unencrypted SOPS files detected in stage:"
+    for f in "${UNSAFE_FILES[@]}"; do
+        echo -e "  - $f"
+    done
+    exit 1
+fi
