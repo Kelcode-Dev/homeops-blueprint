@@ -1,0 +1,15 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: smtp
+  namespace: smtp
+spec:
+  interval: 24h
+  chart:
+    spec:
+      chart: smtp-relay
+      version: "0.7.x"
+      sourceRef:
+        kind: HelmRepository
+        name: djjudas21
+        namespace: flux-system

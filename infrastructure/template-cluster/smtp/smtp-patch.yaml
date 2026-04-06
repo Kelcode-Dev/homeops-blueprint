@@ -1,0 +1,22 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: smtp
+  namespace: smtp
+spec:
+  values:
+    nodeSelector:
+      node-role.kubernetes.io/cpu-worker: "true"
+
+    persistence:
+      enabled: true
+      size: 1Gi
+      storageClass: nfs-client    # the name of your storage class
+
+    secret:
+      create: false               # Create a sops file and put the password in there
+
+    smtp:
+      host: smtp.eu.mailgun.org   # SMTP Host adress
+      port: 587                   # SMTP PORT
+      username: CHANGEME          # SMTP Username (email address for mailgun)
