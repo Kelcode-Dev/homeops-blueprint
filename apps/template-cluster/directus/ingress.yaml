@@ -1,0 +1,15 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: directus-web
+  namespace: directus
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`directus.example.com`)           # CHANGE this to your directus URL
+      services:
+        - name: directus
+          port: 8055
+  tls:
+    secretName: directus-tls

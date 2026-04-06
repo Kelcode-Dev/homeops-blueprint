@@ -1,0 +1,12 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: directus-cert
+  namespace: directus
+spec:
+  secretName: directus-tls
+  issuerRef:
+    name: CHANGEME                     # Set this to your cert-manager cluster issuer
+    kind: ClusterIssuer
+  dnsNames:
+    - directus.example.com      # CHANGEME to your Directus URL

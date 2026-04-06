@@ -1,0 +1,42 @@
+apiVersion: v1
+kind: Secret
+metadata:
+    name: directus-secrets
+    namespace: directus
+type: Opaque
+stringData:
+    # Core and Security
+    KEY: CHANGEM                                    # Use `openssl rand -hex 32` to generate a random string
+    SECRET: CHANGEME                                # Use `openssl rand -hex 32` to generate a random string
+    PUBLIC_URL: https://directus.example.com        # Set this to the same as the ingress you set up
+    ADMIN_EMAIL: email@gizzmoshifu.uk               # Set this to your admin email address
+    ADMIN_PASSWORD: CHANGEME                        # Set this to you admin password
+    TELEMETRY: "false"
+
+    # DB Config - set this up if you've deployed a postgres cluster
+    DB_CLIENT: pg
+    DB_HOST: pg-shared-rw.databases.svc.cluster.local
+    DB_PORT: "5432"
+    DB_DATABASE: directus
+    DB_USER: directus
+    DB_PASSWORD: CHANGEME
+
+    # Caching - set this up if you've deployed a valkey cluster
+    REDIS_HOST: valkey.valkey.svc.cluster.local
+    REDIS_PORT: "6379"
+    REDIS_PASSWORD: CHANGEME
+    CACHE_ENABLED: "true"
+    CACHE_STORE: redis
+    CACHE_AUTO_PURGE: "true"
+    MESSENGER_STORE: redis
+    SYNCHRONIZATION_STORE: redis
+
+    # Smtp configs - set this up if you've deployed the smtp-relay
+    EMAIL_TRANSPORT: smtp
+    EMAIL_SMTP_HOST: smpt-relay.smtp.svc.cluster.local
+    EMAIL_SMTP_PORT: "25"
+    EMAIL_SMTP_USER: ""
+    EMAIL_SMTP_PASSWORD: ""
+    EMAIL_SMTP_POOL: "true"
+    EMAIL_SMTP_SECURE: "false"
+    EMAIL_SMTP_IGNORE_TLS: "true"

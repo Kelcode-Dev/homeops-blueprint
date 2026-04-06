@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: directus
+  namespace: directus
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: directus
+  template:
+    metadata:
+      labels:
+        app: directus
+        app.kubernetes.io/name: directus
+    spec:
+      containers:
+        - name: directus
+          image: directus/directus:11.1
+          ports:
+            - containerPort: 8055
