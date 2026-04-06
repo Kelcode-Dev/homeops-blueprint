@@ -1,0 +1,26 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ollama-ingress
+  namespace: models
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+    cert-manager.io/cluster-issuer: letsencrypt      # CHANGE this to your cert-manager cluster issuer
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: ollama.example.com                       # CHANGE this to your ollama URL
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: ollama-service
+                port:
+                  number: 80
+  tls:
+    - hosts:
+        - ollama.example.com                         # CHANGE this to your ollama URL
+      secretName: ollama-tls

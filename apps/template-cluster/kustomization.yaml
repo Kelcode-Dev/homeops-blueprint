@@ -11,3 +11,4 @@ resources:
   - outline
   - transmute
   - uptime-kuma
+  - ollama
