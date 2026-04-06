@@ -16,3 +16,19 @@ spec:
     provider: sops
     secretRef:
       name: sops-age
+---
+# Cilium Configs Sync (has to run after the CRDs are installed)
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: cilium-configs
+  namespace: flux-system
+spec:
+  interval: 10m
+  path: ./infrastructure/talos-eternium/cilium-configs
+  prune: true
+  dependsOn:
+    - name: infrastructure
+  sourceRef:
+    kind: GitRepository
+    name: flux-system

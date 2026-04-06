@@ -1,0 +1,8 @@
+apiVersion: "cilium.io/v2"
+kind: CiliumLoadBalancerIPPool
+metadata:
+  name: pdc-pool
+spec:
+  blocks:
+    - start: "192.168.0.230"  # Set this to the start of your "public" vLAN
+      stop: "192.168.0.239"   # Set this to the end of your "public" vLAN

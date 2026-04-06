@@ -1,0 +1,14 @@
+apiVersion: "cilium.io/v2alpha1"
+kind: CiliumL2AnnouncementPolicy
+metadata:
+  name: pdc-l2-adv
+spec:
+  # This targets all LoadBalancer services across all namespaces
+  serviceSelector: {}
+  nodeSelector:
+    matchLabels:
+      kubernetes.io/os: linux
+  interfaces:
+    - ^eth0$  # CHANGE this to the main ethernet device of your nodes ens160|eth0 etc.
+  externalIPs: true
+  loadBalancerIPs: true

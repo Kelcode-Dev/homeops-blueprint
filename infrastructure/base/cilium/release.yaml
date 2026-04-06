@@ -1,0 +1,80 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: cilium
+  namespace: kube-system
+spec:
+  interval: 15m
+  chart:
+    spec:
+      chart: cilium
+      version: "1.19.1"
+      sourceRef:
+        kind: HelmRepository
+        name: cilium
+        namespace: flux-system
+  install:
+    crds: CreateReplace
+  upgrade:
+    crds: CreateReplace
+  values:
+    ipam:
+      mode: kubernetes
+    kubeProxyReplacement: true
+    cgroup:
+      autoMount:
+        enabled: false
+      hostRoot: /sys/fs/cgroup
+    securityContext:
+      capabilities:
+        ciliumAgent:
+          - CHOWN
+          - KILL
+          - NET_ADMIN
+          - NET_RAW
+          - IPC_LOCK
+          - SYS_ADMIN
+          - SYS_RESOURCE
+          - DAC_OVERRIDE
+          - FOWNER
+          - SETGID
+          - SETUID
+        cleanCiliumState:
+          - NET_ADMIN
+          - SYS_ADMIN
+          - SYS_RESOURCE
+    encryption:
+      enabled: true
+      type: wireguard
+    gatewayAPI:
+      enabled: true
+      enableAlpn: true
+      enableAppProtocol: true
+    k8sClientRateLimit:
+      qps: 30
+      burst: 60
+    l2announcements:
+      enabled: true
+      leaseDuration: 30s
+      leaseRenewalDeadline: 20s
+      retryPeriod: 5s
+    externalIPs:
+      enabled: true
+    prometheus:
+      enabled: false
+    hubble:
+      enabled: true
+      metrics:
+        enableOpenMetrics: true
+        enabled:
+          - dns
+          - drop:labelsContext=source_namespace,destination_namespace
+          - tcp
+          - flow:labelsContext=source_namespace,destination_namespace
+          - port-distribution
+          - icmp
+          - httpV2:exemplars=true;labelsContext=source_ip,source_namespace,source_workload,destination_ip,destination_namespace,destination_workload,traffic_direction
+      relay:
+        enabled: true
+      ui:
+        enabled: true
