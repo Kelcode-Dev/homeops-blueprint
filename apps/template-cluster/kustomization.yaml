@@ -5,3 +5,9 @@ resources:
   - ../base/tailscale
   - podinfo
   - homepage
+  - directus
+  - draw.io
+  - linkding
+  - outline
+  - transmute
+  - uptime-kuma
