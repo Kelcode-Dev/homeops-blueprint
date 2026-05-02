@@ -1,0 +1,76 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: harbor
+  namespace: harbor
+spec:
+  values:
+    nodeSelector:
+      node-role.kubernetes.io/cpu-worker: "true"
+
+    existingSecretAdminPassword: harbor-secrets
+
+    # Ingress configuration
+    expose:
+      tls:
+        enabled: true
+        certSource: secret
+        secret:
+          secretName: harbor-gizzmoshifu-tls
+      ingress:
+        className: traefik
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-production
+          traefik.ingress.kubernetes.io/router.entrypoints: websecure
+          traefik.ingress.kubernetes.io/router.tls: "true"
+        hosts:
+          core: registry.example.com
+
+    externalURL: https://registry.example.com
+
+    # PostgreSQL configuration
+    database:
+      type: external
+      external:
+        host: pg-shared-rw.databases.svc.cluster.local
+        port: 5432
+        username: harbor
+        coreDatabase: harbor
+        existingSecret: harbor-secrets
+        sslmode: require
+
+    # Redis configuration
+    redis:
+      type: external
+      external:
+        addr: valkey.valkey.svc.cluster.local:6379
+        existingSecret: harbor-secrets
+        coreDatabaseIndex: "20"
+        jobserviceDatabaseIndex: "21"
+        registryDatabaseIndex: "22"
+        trivyAdapterIndex: "25"
+        harborDatabaseIndex: "26"
+        cacheLayerDatabaseIndex: "27"
+
+    # Storage configuration
+    persistence:
+      enabled: true
+      imageChartStorage:
+        type: s3
+        s3:
+          region: "us-east-1"
+          bucket: "harbor-registry"
+          regionendpoint: "http://192.168.0.203:8333"
+          secure: false
+          disableredirect: true
+
+          # Chart expects these keys (supported in the storage backend options)
+          existingSecret: harbor-secrets
+          chunksize: "104857600"
+          multipartcopychunksize: "104857600"
+
+      persistentVolumeClaim:
+        jobservice:
+          jobLog:
+            size: 5Gi
+            storageClass: nfs-client
