@@ -1,0 +1,13 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../../base/authelia
+  - authelia-secrets.sops.yaml
+  - authelia-user-secrets.sops.yaml
+  - authelia-oidc-secrets.sops.yaml
+
+patches:
+  - path: authelia-patch.yaml
+    target:
+      kind: HelmRelease
+      name: authelia
