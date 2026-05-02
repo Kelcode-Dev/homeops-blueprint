@@ -23,14 +23,19 @@ encrypt-all:
     fi; \
   done
 
-# Encrypt a specific secret (e.g., just encrypt database)
-# usage: just encrypt <name> (without the .sops.yaml suffix)
-encrypt name:
-  sops -e --in-place {{name}}
+# Encrypt one or more specific secrets
+# usage: just encrypt <name1> <name2>
+encrypt +names:
+    for file in {{names}}; do \
+        sops -e --in-place "$file"; \
+    done
 
-# Decrypt a specific secret
-decrypt name:
-  sops -d --in-place {{name}}
+# Decrypt one or more specific secrets
+# usage: just decrypt <name1> <name2>
+decrypt +names:
+    for file in {{names}}; do \
+        sops -d --in-place "$file"; \
+    done
 
 ## FLUX Worklods
 
