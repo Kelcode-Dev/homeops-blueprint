@@ -1,0 +1,17 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: ScheduledBackup
+metadata:
+  name: cluster-daily-backup
+  namespace: databases
+spec:
+  # Run daily at 2 AM UTC
+  schedule: "0 2 * * *"
+  # Reference to the PostgreSQL cluster
+  cluster:
+    name: pg-shared
+  # Backup type: full database backup
+  backupOwnerReference: self
+  # Immediate backup on creation
+  immediate: false
+  # Suspend the schedule if needed
+  suspend: false

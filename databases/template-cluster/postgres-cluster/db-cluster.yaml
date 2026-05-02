@@ -1,0 +1,127 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: pg-shared
+  namespace: databases
+spec:
+  # Number of instances (1 primary + 2 standby replicas)
+  instances: 3
+  # PostgreSQL version
+  imageName: ghcr.io/cloudnative-pg/postgresql:18.3-system-trixie
+
+  affinity:
+    nodeSelector:
+      node-role.kubernetes.io/cpu-worker: "true"
+    topologyKey: kubernetes.io/hostname
+    podAntiAffinityType: required
+
+  env:
+    - name: AWS_ACCESS_KEY_ID
+      valueFrom:
+        secretKeyRef:
+          name: pg-s3-creds
+          key: access-key
+    - name: AWS_SECRET_ACCESS_KEY
+      valueFrom:
+        secretKeyRef:
+          name: pg-s3-creds
+          key: secret-key
+    - name: AWS_DEFAULT_REGION
+      value: "us-east-1"
+    - name: BARMAN_S3_FORCE_PATH_STYLE
+      value: "true"
+
+  # PostgreSQL configuration
+  postgresql:
+    parameters:
+      # Memory configuration
+      shared_buffers: "256MB"
+      effective_cache_size: "768MB"
+      work_mem: "16MB"
+      maintenance_work_mem: "128MB"
+      # WAL configuration
+      wal_buffers: "16MB"
+      max_wal_size: "1GB"
+      min_wal_size: "512MB"
+      # Connection settings
+      max_connections: "200"
+      # Logging
+      log_statement: "ddl"
+      log_min_duration_statement: "1000"
+    # Enable pg_stat_statements extension
+    pg_hba:
+      - host all all 10.244.0.0/16 md5      # Explicit Pod Network
+      - host all all 10.96.0.0/12 md5       # Standard K8s Service Network
+      - host all all 192.168.0.0/16 md5     # Physical Lab (SeaweedFS/Workstation)
+
+  # Bootstrap configuration for initial setup
+  bootstrap:
+    initdb:
+      database: app
+      owner: app
+
+      # Runs these commands against template1 so ALL future DBs inherit them
+      postInitTemplateSQL:
+        - CREATE EXTENSION IF NOT EXISTS pg_stat_statements;
+        - CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
+  # Superuser credentials
+  superuserSecret:
+    name: pg-sa-creds
+
+  # Storage configuration
+  storage:
+    size: 20Gi
+    storageClass: nfs-client
+    # PVC resize policy
+    pvcTemplate:
+      accessModes:
+        - ReadWriteOnce
+
+  # WAL storage on a separate volume for performance
+  walStorage:
+    size: 5Gi
+    storageClass: nfs-client
+
+  # Resource limits for PostgreSQL pods
+  resources:
+    requests:
+      cpu: 500m
+      memory: 1Gi
+    limits:
+      cpu: "2"
+      memory: 2Gi
+
+  # Monitoring configuration
+  monitoring:
+    enablePodMonitor: true
+    customQueriesConfigMap:
+      - name: custom-queries
+        key: queries
+
+  # Backup configuration using object storage
+  backup:
+    barmanObjectStore:
+      destinationPath: "s3://postgres-backups/"
+      endpointURL: "http://192.168.0.203:8333"
+      s3Credentials:
+        accessKeyId:
+          name: pg-s3-creds
+          key: access-key
+        secretAccessKey:
+          name: pg-s3-creds
+          key: secret-key
+      wal:
+        compression: gzip
+        maxParallel: 2
+      data:
+        compression: gzip
+    retentionPolicy: "30d"
+
+  managed:
+    roles:
+    - name: example
+      ensure: present
+      login: true
+      passwordSecret:
+        name: pg-example-creds

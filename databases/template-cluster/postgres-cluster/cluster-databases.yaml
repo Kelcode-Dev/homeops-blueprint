@@ -1,0 +1,13 @@
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: example
+  namespace: databases
+spec:
+  name: example
+  owner: example
+  cluster:
+    name: pg-shared
+  databaseReclaimPolicy: retain
+---

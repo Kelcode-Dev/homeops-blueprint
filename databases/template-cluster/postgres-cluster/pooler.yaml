@@ -1,0 +1,67 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Pooler
+metadata:
+  name: cluster-pooler-rw
+  namespace: databases
+spec:
+  cluster:
+    name: pg-shared
+  instances: 2
+  type: rw
+  template:
+    metadata:
+      labels:
+        app: pooler-rw
+    spec:
+      containers: [] # Mandatory for dry-run validation
+      nodeSelector:
+        node-role.kubernetes.io/cpu-worker: "true" # Pins to CPU nodes
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - pooler-rw
+            topologyKey: "kubernetes.io/hostname" # Spreads across hosts
+  pgbouncer:
+    poolMode: transaction
+    parameters:
+      max_client_conn: "1000"
+      default_pool_size: "25"
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Pooler
+metadata:
+  name: cluster-pooler-ro
+  namespace: databases
+spec:
+  cluster:
+    name: pg-shared
+  instances: 2
+  type: ro
+  template:
+    metadata:
+      labels:
+        app: pooler-ro
+    spec:
+      containers: [] # Mandatory for dry-run validation
+      nodeSelector:
+        node-role.kubernetes.io/cpu-worker: "true"
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - pooler-ro
+            topologyKey: "kubernetes.io/hostname"
+  pgbouncer:
+    poolMode: transaction
+    parameters:
+      max_client_conn: "1000"
+      default_pool_size: "25"

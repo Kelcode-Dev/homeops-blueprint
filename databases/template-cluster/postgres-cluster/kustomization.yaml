@@ -1,0 +1,10 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - namespace.yaml
+  - creds-example.sops.yaml
+  - custom-queries.yaml
+  - db-cluster.yaml
+  - backups.yaml
+  - pooler.yaml
+  - cluster-databases.yaml
