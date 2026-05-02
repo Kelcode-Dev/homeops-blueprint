@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: searxng-cm
+  namespace: searxng
+data:
+  settings.yml: |
+    use_default_settings: true
+    server:
+      port: 8080
+      bind_address: "0.0.0.0"
+    search:
+      formats:
+        - html
+        - json
+    engines:
+      # --- Disable the problem engines ---
+      - name: brave
+        disabled: true
+      - name: karmasearch
+        disabled: true
+      - name: wikidata
+        disabled: true
+
+      # --- Explicitly enable resilient engines ---
+      - name: google
+        disabled: false
+        weight: 2
+      - name: duckduckgo
+        disabled: false
+        weight: 2
+      - name: startpage
+        disabled: false
+      - name: bing
+        disabled: false
+
+      # --- Keep the media junk disabled for LLMs ---
+      - name: soundcloud
+        disabled: true
+      - name: vimeo
+        disabled: true

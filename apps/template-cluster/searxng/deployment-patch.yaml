@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: searxng
+  namespace: searxng
+spec:
+  selector:
+    matchLabels:
+      app: searxng
+  template:
+    metadata:
+      labels:
+        app: searxng
+    spec:
+      containers:
+        - name: searxng
+          env:
+            - name: FORCE_OWNERSHIP
+              value: "false"
+            - name: SEARXNG_BASEURL
+              value: https://searxng.example.com
+            - name: SEARXNG_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: searxng-secrets
+                  key: SEARXNG_SECRET
+            - name: SEARXNG_URL_SECURE
+              value: "true"
+            - name: SEARXNG_VALKEY_URL
+              valueFrom:
+                secretKeyRef:
+                  name: searxng-secrets
+                  key: SEARXNG_VALKEY_URL
+            - name: SEARXNG_PORT
+              value: "8080"
+            - name: SEARXNG_SETTINGS_PATH
+              value: "/etc/searxng-custom/settings.yml"
+          volumeMounts:
+          - name: searxng-config
+            mountPath: /etc/searxng
+          - name: searxng-cache
+            mountPath: /var/cache/searxng
+          - name: custom-settings
+            mountPath: /etc/searxng-custom
+            readOnly: true
+      volumes:
+      - name: searxng-config
+        emptyDir: {}
+      - name: searxng-cache
+        emptyDir: {}
+      - name: custom-settings
+        configMap:
+          name: searxng-cm
+      nodeSelector:
+        node-role.kubernetes.io/cpu-worker: "true"
