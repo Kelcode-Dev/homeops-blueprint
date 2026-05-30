@@ -5,6 +5,7 @@ resources:
   - ../base/nv-device-plugin
   - ../base/metrics-server
   - ../base/postgres-operator
+  - ../base/cloudflared
   - cilium
   - cert-manager
   - traefik
