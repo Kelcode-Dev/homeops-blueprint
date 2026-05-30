@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ghostcms
+  labels:
+    app.kubernetes.io/name: ghostcms
+    app.kubernetes.io/instance: ghostcms

@@ -1,0 +1,20 @@
+# ---
+# SETUP INSTRUCTIONS
+# 1. Replace the placeholder values below with your actual database credentials.
+# 2. Run this command to encrypt the file with your own Age key:
+#    `sops --encrypt --in-place ghost-values.sops.yaml`
+# 3. Ensure your kustomization.yaml points to the .sops.yaml version.
+# ---
+
+apiVersion: v1
+kind: Secret
+metadata:
+    name: ghostcms-credentials
+    namespace: ghostcms
+type: Opaque
+stringData:
+    db-host: "YOUR_DB_HOST"
+    db-port: "YOUR_DB_PORT"
+    db-database: "YOUR_DB_NAME"
+    db-username: "YOUR_DB_USER"
+    db-password: "YOUR_DB_PASSWORD"

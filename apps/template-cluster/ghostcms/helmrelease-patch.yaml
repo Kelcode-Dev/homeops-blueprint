@@ -1,0 +1,38 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: ghostcms
+spec:
+  targetNamespace: ghostcms
+  values:
+    fullnameOverride: ghostcms
+    podSecurityContext:
+      seccompProfile:
+        type: RuntimeDefault
+    ghost:
+      url: https://YOUR_DOMAIN
+      adminUrl: https://YOUR_DOMAIN
+      mail: # configure this for mailgun if you prefer
+        service: "SMTP"
+        port: 25
+        secure: false
+        user: "postmaster@YOUR_DOMAIN"
+        host: "smtp-relay.relay.svc.cluster.local"
+        from: "noreply@YOUR_DOMAIN"
+    ingress:
+      enabled: true
+      className: "traefik"
+      preset: "custom"
+      annotations:
+        traefik.ingress.kubernetes.io/router.entrypoints: websecure
+        traefik.ingress.kubernetes.io/router.tls: "true"
+        cert-manager.io/cluster-issuer: letsencrypt-production
+      hosts:
+        - host: YOUR_DOMAIN
+          paths:
+            - path: /
+              pathType: ImplementationSpecific
+      tls:
+        enabled: true
+        mode: manual
+        secretName: ghostcms-tls

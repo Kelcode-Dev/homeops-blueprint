@@ -12,3 +12,4 @@ resources:
   - transmute
   - uptime-kuma
   - ollama
+  - ghostcms
