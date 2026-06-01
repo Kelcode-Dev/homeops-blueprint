@@ -1,0 +1,54 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: openwebui
+  namespace: openwebui
+spec:
+  values:
+    nodeSelector:
+      node-role.kubernetes.io/cpu-worker: "true"
+
+    # Disable ollama in favour of the standalone deployment
+    ollama:
+      enabled: false
+    ollamaUrls:
+      - http://ollama.ollama.svc.cluster.local:3000
+
+    ingress:
+      enabled: true
+      class: "traefik"
+      annotations:
+        traefik.ingress.kubernetes.io/router.entrypoints: websecure
+        traefik.ingress.kubernetes.io/router.tls: "true"
+        cert-manager.io/cluster-issuer: letsencrypt-production
+      host: chat.example.com
+      tls:
+        - hosts:
+            - chat.example.com
+          secretName: openwebui-tls
+
+    websocket:
+      enabled: false
+
+    extraEnvFrom:
+      - secretRef:
+          name: openwebui-secrets
+
+    persistence:
+      enabled: true
+      size: 10Gi
+      storageClass: nfs-client
+
+    sso:
+      oidc:
+        enabled: true
+        # rest is configured via envvars
+        clientExistingSecret: openwebui-secrets
+        clientIdExistingSecretKey: "OAUTH_CLIENT_ID"
+        clientExistingSecretKey: "OAUTH_CLIENT_SECRET"
+        providerUrl: https://authelia.example.com
+        providerName: Authelia
+
+    pipelines:
+      nodeSelector:
+        node-role.kubernetes.io/cpu-worker: "true"
