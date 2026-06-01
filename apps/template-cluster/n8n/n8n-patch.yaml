@@ -1,0 +1,147 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: n8n
+  namespace: n8n
+spec:
+  values:
+    image:
+      tag: 1.123.28
+
+    # Shared anchors
+    shared_config: &shared_config
+      db:
+        type: postgresdb
+        postgresdb:
+          host: cluster-pooler-rw.databases.svc.cluster.local
+          port: 5432
+          database: n8n
+          user: n8n
+          ssl_enabled: false
+      queue:
+        bull:
+          redis_port: 6379
+          redis_host: valkey.valkey.svc.cluster.local
+          redis_db: 2
+
+    shared_env: &shared_env
+      DB_POSTGRESDB_PASSWORD:
+        valueFrom:
+          secretKeyRef:
+            name: n8n-secrets
+            key: pg_password
+      N8N_ENCRYPTION_KEY:
+        valueFrom:
+          secretKeyRef:
+            name: n8n-secrets
+            key: n8n_encryption_key
+      QUEUE_BULL_REDIS_PASSWORD:
+        valueFrom:
+          secretKeyRef:
+            name: n8n-secrets
+            key: redis_password
+      N8N_CONCURRENCY_PRODUCTION_LIMIT:
+        value: "5"
+      N8N_PORT:
+        value: "5678"
+      QUEUE_HEALTH_CHECK_ACTIVE:
+        value: "true"
+      N8N_WORKER_SERVER_ADDRESS:
+        value: "0.0.0.0"
+      EXECUTIONS_MODE:
+        value: "queue"
+      N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS:
+        value: "true"
+      N8N_RUNNERS_ENABLED:
+        value: "true"
+      OFFLOAD_MANUAL_EXECUTIONS_TO_WORKERS:
+        value: "true"
+      N8N_BLOCK_ENV_ACCESS_IN_NODE:
+        value: "true"
+      N8N_GIT_NODE_DISABLE_BARE_REPOS:
+        value: "true"
+
+    shared_pod_security: &shared_pod_security
+      fsGroup: 1000
+      runAsUser: 1000
+      runAsGroup: 1000
+
+    shared_security: &shared_security
+      capabilities:
+        drop:
+        - ALL
+      allowPrivilegeEscalation: false
+      seccompProfile:
+        type: RuntimeDefault
+
+    shared_storage: &shared_storage
+      extraVolumes:
+        - name: n8n-data-volume
+          persistentVolumeClaim:
+            claimName: n8n-data
+      extraVolumeMounts:
+        - name: n8n-data-volume
+          mountPath: /data
+
+    # Apply anchors to the specific components
+    main:
+      securityContext: *shared_security
+      podSecurityContext: *shared_pod_security
+      config:
+        <<: *shared_config
+        n8n:
+          hide_usage_page: false
+          executions_mode: queue
+      extraEnv: *shared_env
+      <<: *shared_storage
+
+    worker:
+      enabled: true
+      securityContext: *shared_security
+      podSecurityContext: *shared_pod_security
+      config:
+        <<: *shared_config
+      extraEnv: *shared_env
+      <<: *shared_storage
+      resources:
+        requests:
+          cpu: 250m
+          memory: 512Mi
+        limits:
+          cpu: 1000m
+          memory: 1Gi
+      autoscaling:
+        enabled: true
+        minReplicas: 1
+        maxReplicas: 5
+        targetCPUUtilizationPercentage: 80
+
+    webhook:
+      enabled: true
+      securityContext: *shared_security
+      podSecurityContext: *shared_pod_security
+      config:
+        <<: *shared_config
+      extraEnv: *shared_env
+
+    # Set up the ingress
+    ingress:
+      enabled: true
+      annotations:
+        traefik.ingress.kubernetes.io/router.entrypoints: websecure
+        traefik.ingress.kubernetes.io/router.tls: "true"
+        cert-manager.io/cluster-issuer: letsencrypt-production
+      hosts:
+        - host: n8n.example.com
+          paths:
+            - path: /
+              pathType: Prefix
+              backend:
+                service:
+                  name: n8n
+                  port:
+                    number: 80
+      tls:
+        - hosts:
+            - n8n.example.com
+          secretName: n8n-tls
