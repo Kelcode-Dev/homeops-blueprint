@@ -6,4 +6,7 @@ kind: Kustomization
 # Add your application manifests or overlays to the resources list below
 # ---
 
-resources: []
+resources:
+  - ../base/proxysql
+  - ../base/valkey
+  - postgres-cluster

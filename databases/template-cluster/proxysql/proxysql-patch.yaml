@@ -1,0 +1,39 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: proxysql
+  namespace: proxysql
+spec:
+  template:
+    spec:
+      hostAliases:
+        # Optional: replace with your MySQL backend hostnames and IPs
+        # - ip: "192.168.0.141"
+        #   hostnames:
+        #     - "mysql-master"
+        # - ip: "192.168.0.142"
+        #   hostnames:
+        #     - "mysql-replica-01"
+      containers:
+        - name: proxysql
+          env:
+            - name: PROXYSQL_DATADIR
+              value: /var/lib/proxysql
+            - name: PROXYSQL_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: proxysql-admin-password
+                  key: password
+            - name: PROXYSQL_MONITOR_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: proxysql-monitor-credentials
+                  key: password
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/proxysql
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: proxysql-data
