@@ -7,9 +7,10 @@ resources:
   - homepage
   - directus
   - drawio
+  - forgejo
+  - ghostcms
   - linkding
+  - ollama
   - outline
   - transmute
   - uptime-kuma
-  - ollama
-  - ghostcms

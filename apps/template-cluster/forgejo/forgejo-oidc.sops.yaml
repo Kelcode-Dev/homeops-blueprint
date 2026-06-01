@@ -1,0 +1,22 @@
+# ---
+# SETUP INSTRUCTIONS
+# 1. Replace the placeholder values below with your actual OIDC/Authelia credentials.
+# 2. Run this command to encrypt the file with your own Age key:
+#    `sops --encrypt --in-place forgejo-oidc.sops.yaml`
+# 3. Ensure your kustomization.yaml points to the .sops.yaml version.
+# ---
+
+apiVersion: v1
+kind: Secret
+metadata:
+    name: forgejo-oidc
+    namespace: forgejo
+type: Opaque
+stringData:
+    # OIDC client credentials (from your Authelia/OIDC provider)
+    key: "YOUR_OIDC_CLIENT_KEY"
+    secret: "YOUR_OIDC_CLIENT_SECRET"
+    # Admin account credentials (for initial setup)
+    username: "YOUR_ADMIN_USERNAME"
+    password: "YOUR_ADMIN_PASSWORD"
+    email: "YOUR_ADMIN_EMAIL"

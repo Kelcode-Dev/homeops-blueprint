@@ -1,0 +1,33 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: forgejo
+  namespace: forgejo
+spec:
+  interval: 24h
+  timeout: 15m
+  chart:
+    spec:
+      chart: forgejo
+      version: "16.2.1"
+      sourceRef:
+        kind: HelmRepository
+        name: forgejo
+        namespace: flux-system
+  values:
+    podSecurityContext:
+      runAsUser: 1000
+      runAsGroup: 1000
+      fsGroup: 1000
+      runAsNonRoot: true
+      seccompProfile:
+        type: RuntimeDefault
+
+    containerSecurityContext:
+      allowPrivilegeEscalation: false
+      privileged: false
+      capabilities:
+        drop:
+          - ALL
+        add:
+          - SYS_CHROOT
