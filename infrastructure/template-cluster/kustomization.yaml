@@ -6,6 +6,7 @@ resources:
   - ../base/metrics-server
   - ../base/postgres-operator
   - ../base/cloudflared
+  - ../base/external-dns
   - cilium
   - cert-manager
   - traefik

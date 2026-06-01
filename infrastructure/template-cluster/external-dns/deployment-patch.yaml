@@ -1,0 +1,23 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: external-dns
+  namespace: externaldns
+spec:
+  template:
+    spec:
+      containers:
+        - name: external-dns
+          envFrom:
+            - secretRef:
+                name: external-dns-secrets
+          args:
+            - --source=service
+            - --source=ingress
+            # Update these for your DNS provider:
+            # - --provider=cloudflare
+            # - --domain-filter=YOUR_DOMAIN
+            # - --registry=txt
+            # - --txt-prefix=k8s-
+            # - --txt-owner-id=talos
