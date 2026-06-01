@@ -5,10 +5,10 @@ resources:
   - ../base/nv-device-plugin
   - ../base/metrics-server
   - ../base/postgres-operator
-  - ../base/cloudflared
-  - ../base/external-dns
+  - cloudflared
   - cilium
   - cert-manager
+  - external-dns
   - traefik
   - tailscale
   - nfs-provisioner
