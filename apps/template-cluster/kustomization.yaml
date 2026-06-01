@@ -3,14 +3,17 @@ kind: Kustomization
 
 resources:
   - ../base/tailscale
-  - podinfo
+  - audiobookshelf
   - homepage
   - directus
   - drawio
   - forgejo
   - ghostcms
   - linkding
+  - n8n
   - ollama
+  - openwebui
   - outline
+  - podinfo
   - transmute
   - uptime-kuma

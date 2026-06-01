@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: audiobookshelf
+  namespace: audiobookshelf
+spec:
+  template:
+    spec:
+      nodeSelector:
+        node-role.kubernetes.io/cpu-worker: "true"
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        fsGroupChangePolicy: "OnRootMismatch"
+      containers:
+        - name: audiobookshelf
+          env:
+            - name: TZ
+              value: "Europe/London"
+            - name: TONIC_MAX_PAYLOAD_SIZE
+              value: "524288000"
+            - name: MAX_UPLOAD_SIZE
+              value: "524288000"
+          volumeMounts:
+            - name: config
+              mountPath: /config
+            - name: metadata
+              mountPath: /metadata
+            - name: audiobookshelf-media
+              mountPath: /audiobookshelf-media
+      volumes:
+        - name: config
+          persistentVolumeClaim:
+            claimName: audiobookshelf-config
+        - name: metadata
+          persistentVolumeClaim:
+            claimName: audiobookshelf-metadata
+        - name: audiobookshelf-media
+          persistentVolumeClaim:
+            claimName: audiobookshelf-media-nas
