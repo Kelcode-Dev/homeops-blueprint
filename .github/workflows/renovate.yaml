@@ -29,7 +29,9 @@ permissions:
 
 jobs:
   renovate:
-    runs-on: [self-hosted, homeops]
+    runs-on:
+      group: Homeops
+      labels: [self-hosted, homeops]
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v6

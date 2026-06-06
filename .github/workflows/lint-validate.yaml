@@ -7,7 +7,9 @@ on:
 
 jobs:
   validate:
-    runs-on: ubuntu-latest
+    runs-on:
+      group: Homeops
+      labels: [self-hosted, homeops]
     steps:
       - name: Checkout
         uses: actions/checkout@v6
