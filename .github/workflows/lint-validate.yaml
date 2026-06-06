@@ -9,7 +9,7 @@ jobs:
   validate:
     runs-on:
       group: Homeops
-      labels: [self-hosted, homeops]
+      labels: homeops
     steps:
       - name: Checkout
         uses: actions/checkout@v6
