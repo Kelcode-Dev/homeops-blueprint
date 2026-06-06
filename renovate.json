@@ -4,8 +4,8 @@
     "config:recommended",
     "group:allNonMajor"
   ],
-  "prHourlyLimit": 5,
-  "prConcurrentLimit": 10,
+  "prHourlyLimit": 0,
+  "prConcurrentLimit": 0,
   "labels": ["renovate", "dependencies"],
   "automergeType": "pr",
   "branchTopic": "{{{depNameSanitized}}}-{{{newMajor}}}.x",
