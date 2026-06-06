@@ -8,7 +8,7 @@ spec:
   chart:
     spec:
       chart: smtp-relay
-      version: "0.7.x"
+      version: "0.8.x"
       sourceRef:
         kind: HelmRepository
         name: djjudas21

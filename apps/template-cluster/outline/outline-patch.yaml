@@ -8,7 +8,7 @@ spec:
   chart:
     spec:
       chart: outline
-      version: "0.7.3" # Latest stable version
+      version: "0.8.0" # Latest stable version
       sourceRef:
         kind: HelmRepository
         name: community-charts
