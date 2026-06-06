@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: transmute
-          image: ghcr.io/transmute-app/transmute:v0.9
+          image: ghcr.io/transmute-app/transmute:v1.3
           ports:
             - containerPort: 3313
           resources:

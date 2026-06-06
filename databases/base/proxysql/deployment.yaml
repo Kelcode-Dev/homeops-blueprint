@@ -26,7 +26,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: proxysql
-          image: proxysql/proxysql:3.0.8
+          image: proxysql/proxysql:3.0.9
           ports:
             - name: proxysql
               containerPort: 6032
