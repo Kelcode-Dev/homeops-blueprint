@@ -1,12 +1,13 @@
 name: Flux Diff Preview
 on:
-  pull_request:
-    branches: [main]
-    paths:
-      - 'clusters/**'
-      - 'infrastructure/**'
-      - 'apps/**'
-      - 'databases/**'
+  workflow_dispatch: {}
+  # pull_request:
+  #   branches: [main]
+  #   paths:
+  #     - 'clusters/**'
+  #     - 'infrastructure/**'
+  #     - 'apps/**'
+  #     - 'databases/**'
 
 jobs:
   diff:
