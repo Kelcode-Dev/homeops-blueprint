@@ -1,0 +1,57 @@
+name: Renovate Dependency Updates
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run (no PRs created)'
+        type: choice
+        options:
+          - 'true'
+          - 'lookup'
+          - 'false'
+        default: true
+      log_level:
+        description: 'Log level'
+        type: choice
+        options:
+          - debug
+          - info
+          - warn
+        default: info
+  schedule:
+    - cron: '0 0 * * *'
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+  packages: write
+
+jobs:
+  renovate:
+    runs-on: [self-hosted, homeops]
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v6
+
+      - name: Set Renovate EnvVars
+        run: |
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            echo "RENOVATE_DRY_RUN=false" >> $GITHUB_ENV
+            echo "LOG_LEVEL=info" >> $GITHUB_ENV
+          else
+            echo "RENOVATE_DRY_RUN=${{ github.event.inputs.dry_run }}" >> $GITHUB_ENV
+            echo "LOG_LEVEL=${{ github.event.inputs.log_level }}" >> $GITHUB_ENV
+          fi
+
+      - name: Run Renovate
+        uses: renovatebot/github-action@v46.1.14
+        with:
+          token: ${{ secrets.RENOVATE_TOKEN }}
+          renovate-version: 43
+        env:
+          # Global Self-Hosted Bot Directives
+          RENOVATE_ONBOARDING: "false"
+          RENOVATE_REQUIRE_CONFIG: "required"
+          RENOVATE_REPOSITORIES: ${{ github.repository }}
+          RENOVATE_GIT_AUTHOR: 'Renovate Bot <renovate@gizzmoshifu.uk>'

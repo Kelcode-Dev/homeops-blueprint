@@ -1,0 +1,42 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    "group:allNonMajor"
+  ],
+  "prHourlyLimit": 5,
+  "prConcurrentLimit": 10,
+  "labels": ["renovate", "dependencies"],
+  "automergeType": "pr",
+  "branchTopic": "{{{depNameSanitized}}}-{{{newMajor}}}.x",
+
+  "flux": {
+    "fileMatch": ["\\.yaml$", "\\.yml$"]
+  },
+  "kubernetes": {
+    "fileMatch": ["\\.yaml$", "\\.yml$"]
+  },
+  "helm-values": {
+    "fileMatch": ["\\.yaml$", "\\.yml$"]
+  },
+
+  "packageRules": [
+    {
+      "matchDatasources": ["docker"],
+      "matchPackagePatterns": ["tailscale", "cilium", "traefik", "cert-manager"],
+      "groupName": "core-infrastructure"
+    },
+    {
+      "matchDatasources": ["docker"],
+      "groupName": "docker-image-updates"
+    },
+    {
+      "matchDatasources": ["helm"],
+      "groupName": "helm-chart-updates"
+    },
+    {
+      "matchManagers": ["flux"],
+      "groupName": "flux-helm-releases"
+    }
+  ]
+}
