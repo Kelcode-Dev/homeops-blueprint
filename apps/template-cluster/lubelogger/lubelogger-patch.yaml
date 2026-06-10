@@ -1,0 +1,72 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: lubelogger
+  namespace: lubelogger
+spec:
+  values:
+    # Native Database Linking
+    postgres:
+      connect: true
+      create: false
+      name: lubelogger-secret
+      keyRef: POSTGRES_CONNECTION
+
+    # Native Secret Linking (Mail Config)
+    # The dummy values satisfy the Helm 'required' validation, but the pod
+    # will natively mount the keys from your 'lubelogger-secret' above.
+    secret:
+      create: false
+      name: lubelogger-secret
+
+    oidc:
+      enabled: true
+      create: false
+      name: lubelogger-secret
+
+    # Native Locale Configuration
+    config:
+      LANG: "en_GB.UTF-8"
+      LC_ALL: "en_GB.UTF-8"
+      LOGLEVEL: "Debug"
+      userConfig:
+        UseDarkMode: true
+        UseUKMPG: true
+        EnableAuth: true
+        UserNameHash: "username_hash_sha256"
+        UserPasswordHash: "password_hash_sha256"
+
+    env:
+      - name: UserConfig__UserNameHash
+        valueFrom:
+          secretKeyRef:
+            name: lubelogger-secret
+            key: ROOT_USER_HASH
+      - name: UserConfig__UserPasswordHash
+        valueFrom:
+          secretKeyRef:
+            name: lubelogger-secret
+            key: ROOT_PASS_HASH
+
+    # Ingress & Persistence
+    ingress:
+      enabled: true
+      className: traefik
+      annotations:
+        traefik.ingress.kubernetes.io/router.entrypoints: websecure
+        traefik.ingress.kubernetes.io/router.tls: "true"
+        cert-manager.io/cluster-issuer: letsencrypt-production
+      hosts:
+        - host: lubelogger.example.com
+          paths:
+            - path: /
+              pathType: ImplementationSpecific
+      tls:
+        - secretName: lubelogger-tls
+          hosts:
+            - lubelogger.example.com
+
+    persistence:
+      enabled: true
+      storageClass: nfs-client
+      size: 5Gi
