@@ -4,12 +4,14 @@ kind: Kustomization
 resources:
   - ../base/tailscale
   - audiobookshelf
-  - homepage
   - directus
   - drawio
   - forgejo
   - ghostcms
+  - homepage
   - linkding
+  - lubelogger
+  - navidrome
   - n8n
   - ollama
   - openwebui

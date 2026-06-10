@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Secret
+metadata:
+    name: lastfm-secret
+    namespace: navidrome
+type: Opaque
+stringData:
+    # Get credentials from https://www.last.fm/api/account/create
+    ND_LASTFM_APIKEY: LASTFM_DEVELOPER_APIKEY
+    ND_LASTFM_SECRET: LASTFM_DEVELOPER_SECRET
