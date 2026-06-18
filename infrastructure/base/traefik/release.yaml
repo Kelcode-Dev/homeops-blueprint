@@ -56,11 +56,12 @@ spec:
         enabled: true
         publishedService:
           enabled: true
-    logs:
-      general:
-        level: INFO
-      access:
-        enabled: true
+    log:
+      level: INFO
+      format: json
+
+    accessLog:
+      format: json
 
     metrics:
       prometheus:
