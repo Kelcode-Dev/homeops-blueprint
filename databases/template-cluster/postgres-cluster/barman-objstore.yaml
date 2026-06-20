@@ -1,0 +1,19 @@
+apiVersion: barmancloud.cnpg.io/v1
+kind: ObjectStore
+metadata:
+  name: eternium-seaweedfs
+  namespace: databases
+spec:
+  configuration:
+    destinationPath: s3://postgres-backups/
+    endpointURL: http://seaweedfs_url:8333
+    s3Credentials:
+      accessKeyId:
+        name: pg-s3-creds
+        key: access-key
+      secretAccessKey:
+        name: pg-s3-creds
+        key: secret-key
+    wal:
+      compression: gzip
+      maxParallel: 2

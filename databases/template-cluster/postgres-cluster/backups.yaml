@@ -15,3 +15,7 @@ spec:
   immediate: false
   # Suspend the schedule if needed
   suspend: false
+  # configure backup plugin
+  method: plugin
+  pluginConfiguration:
+    name: barman-cloud.cloudnative-pg.io

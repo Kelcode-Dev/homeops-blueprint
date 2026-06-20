@@ -99,24 +99,11 @@ spec:
       - name: custom-queries
         key: queries
 
-  # Backup configuration using object storage
-  backup:
-    barmanObjectStore:
-      destinationPath: "s3://postgres-backups/"
-      endpointURL: "http://192.168.0.203:8333"
-      s3Credentials:
-        accessKeyId:
-          name: pg-s3-creds
-          key: access-key
-        secretAccessKey:
-          name: pg-s3-creds
-          key: secret-key
-      wal:
-        compression: gzip
-        maxParallel: 2
-      data:
-        compression: gzip
-    retentionPolicy: "30d"
+  plugins:
+  - name: barman-cloud.cloudnative-pg.io
+    isWALArchiver: true
+    parameters:
+      barmanObjectName: eternium-seaweedfs
 
   managed:
     roles:
