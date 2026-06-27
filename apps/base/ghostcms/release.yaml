@@ -18,7 +18,7 @@ spec:
     image:
       repository: ghcr.io/sredevopsorg/ghost-on-kubernetes
       pullPolicy: IfNotPresent
-      tag: v6.47.0
+      tag: v6.49.0
 
     replicaCount: 1
 
