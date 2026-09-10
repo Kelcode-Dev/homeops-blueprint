@@ -11,20 +11,34 @@
   "branchTopic": "{{{depNameSanitized}}}-{{{newMajor}}}.x",
 
   "flux": {
-    "fileMatch": ["\\.yaml$", "\\.yml$"]
+    "managerFilePatterns": [
+      "/\\.yaml$/",
+      "/\\.yml$/"
+    ]
   },
   "kubernetes": {
-    "fileMatch": ["\\.yaml$", "\\.yml$"]
+    "managerFilePatterns": [
+      "/\\.yaml$/",
+      "/\\.yml$/"
+    ]
   },
   "helm-values": {
-    "fileMatch": ["\\.yaml$", "\\.yml$"]
+    "managerFilePatterns": [
+      "/\\.yaml$/",
+      "/\\.yml$/"
+    ]
   },
 
   "packageRules": [
     {
       "matchDatasources": ["docker"],
-      "matchPackagePatterns": ["tailscale", "cilium", "traefik", "cert-manager"],
-      "groupName": "core-infrastructure"
+      "groupName": "core-infrastructure",
+      "matchPackageNames": [
+        "/tailscale/",
+        "/cilium/",
+        "/traefik/",
+        "/cert-manager/"
+      ]
     },
     {
       "matchDatasources": ["docker"],
