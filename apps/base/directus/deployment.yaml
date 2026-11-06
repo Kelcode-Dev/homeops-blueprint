@@ -16,6 +16,6 @@ spec:
     spec:
       containers:
         - name: directus
-          image: directus/directus:12.5
+          image: directus/directus:12.6
           ports:
             - containerPort: 8055
